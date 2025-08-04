@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <title>Game Arena</title>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@500&display=swap" rel="stylesheet">
+</head>
+<style>
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow-x: hidden;  /* hindari scroll horizontal */
+  background-color: #111;
+}
+
+body {
+  font-family: sans-serif;
+  background-color: #111;
+  color: white;
+  text-align: center;
+  margin: 0;
+  padding: 0;
+}
+
+h1 {
+  margin: 20px 0;
+}
+
+#battlefield {
+  position: relative;
+  width: 1000px;
+  height: 500px;
+  margin: 50px auto;         /* ⬅️ Ini yang bikin posisinya di tengah */
+  
+  overflow: hidden;
+  background-color: #000;
+}
+
+
+#background {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  object-fit: cover;
+  z-index: 0;
+  opacity: 1;
+  transition: opacity 0.5s ease-in-out;
+}
+
+/* ===== SPRITESHEET KARAKTER ===== */
+.character {
+  position: absolute;
+
+  /* Ukuran asli frame dari spritesheet */
+  width: 288px;
+  height: 149px;
+
+  background-size: auto auto;
+  background-repeat: no-repeat;
+  background-position: 0 0;
+
+  image-rendering: pixelated;
+  z-index: 2;
+
+  
+
+  /* Tambahan debug (hapus jika tidak perlu) */
+  /* outline: 1px dashed red; */
+}
+
+/* Posisi karakter */
+.hero {
+  bottom: 0;
+}
+
+.boss {
+  bottom: 0;
+  right: 200px; /* Sesuaikan posisi horizontal boss */
+}
+
+/* Posisi individu hero */
+#hero1 {
+  left: 300px;
+}
+
+#hero2 {
+  left: 200px;
+}
+
+#hero3 {
+  left: 100px;
+}
+
+/* === COMMAND MENU ala Suikoden === */
+#commandPanel {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 10;
+  background: rgba(30,30,30,0.95);
+  border: 2px solid #fff;
+  padding: 8px 0;
+  min-width: 140px;
+  font-family: 'EB Garamond', serif;
+  color: #fff;
+  border-radius: 6px;
+  box-shadow: 2px 2px 8px #0008;
+}
+
+.command-item {
+  padding: 6px 18px;
+  cursor: pointer;
+  border-radius: 3px;
+  margin-bottom: 2px;
+  transition: background 0.2s;
+  font-size: 18px;
+}
+
+.command-item.selected,
+.command-item:hover,
+.command-item:focus {
+  background: #c9b15a;
+  color: #222;
+  outline: none;
+}
+/* === css LevelSelector === */
+.level-node {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.level-node img {
+  width: 80px;
+  transition: transform 0.2s;
+}
+.level-node:hover img {
+  transform: scale(1.1);
+}
+
+.connector {
+  position: absolute;
+  left: 50%;
+  width: 4px;
+  height: 60px;
+  background: gray;
+  transform: translateX(-50%);
+  z-index: 0;
+}
+
+/* === main menu === */
+/* background bergeser kiri-kanan */
+.moving-bg {
+  animation: move-bg 8s ease-in-out infinite alternate;
+}
+@keyframes move-bg {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-30px); }
+}
+
+/* tombol berkedip */
+.menu-button {
+  animation: blink 1.6s infinite;
+  transition: transform 0.3s ease;
+}
+.menu-button:hover {
+  transform: scale(1.4);
+}
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.6; }
+}
+
+/* logo ngambang */
+.logo-animated {
+  animation: floatLogo 2.5s ease-in-out infinite alternate;
+}
+@keyframes floatLogo {
+  0%   { transform: translateY(0); }
+  100% { transform: translateY(-15px); }
+}
+#main-menu,
+#level-map {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+
+#main-menu.slide-left {
+  transform: translateX(-100%);
+}
+
+#app {
+  width: 1000px;
+  height: 600px;
+  margin: auto;
+  position: relative;
+  overflow: hidden; /* Ini hanya agar konten tidak keluar ke luar sisi kiri/kanan */
+}
+
+/* === UI dan Skill Menu === */
+#commandPanel {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  display: flex;
+  flex-direction: column;
+  background-color: rgba(0, 0, 0, 0.8);
+  padding: 8px;
+  border-radius: 6px;
+  z-index: 10;
+  color: white;
+}
+
+#skillMenu {
+  position: absolute;
+  top: 55px;
+  left: 322px; /* Geser ke kanan agar tidak tumpang tindih dengan commandPanel */
+  background-color: rgba(0,0,0,0.9);
+  padding: 10px;
+  border-radius: 6px;
+  display: none;
+  z-index: 11;
+  color: white;
+  border: 1px solid #888;
+  max-width: 400px;
+}
+
+
+.skill-menu-item {
+  background-color: white;
+  color: black;
+  padding: 6px 8px;
+  margin-bottom: 6px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  text-align: center;
+}
+
+.skill-menu-item:hover {
+  background-color: goldenrod;
+  color: black;
+}
+
+
+
+</style>
+
+<body>
+
+
+  <div id="battlefield">
+    <div id="commandPanel"></div>
+    <img id="background" src="" alt="Background Arena" />
+
+    <!-- Hero -->
+    <div class="character hero" id="hero1"></div>
+    <div class="character hero" id="hero2"></div>
+    <div class="character hero" id="hero3"></div>
+
+    <!-- Boss -->
+    <div class="character boss" id="boss"></div>
+  </div>
+
+  <div id="game-container"></div>
+  <div id="app" ></div> <!-- ✅ Tambahkan ini -->
+
+  <div id="ui"></div>
+  <div id="skillMenu"></div>
+
+  <script type="module" src="main.js"></script>
+</body>
+
+</html>
+
+
+
+
